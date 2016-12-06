@@ -33,13 +33,15 @@ field(){
 print_cell(){
 	if [ $1 == $EMPTY_CELL ]; then
 		set_black;
+		printf ' '
 	elif [ $1 == $PLAYER_ONE_CELL ]; then
 		set_blue;
+		printf O
 	elif [ $1 == $PLAYER_TWO_CELL ]; then
 		set_red;
+		printf X
 	fi
 
-	printf $1
 	set_black;
 }
 

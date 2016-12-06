@@ -88,6 +88,7 @@ is_some_line_full(){
 			return 1;
 		fi
 
+		is_column_full $i $1
 		res=$?
 		if [ $res == 1 ] ; then
 			return 1;

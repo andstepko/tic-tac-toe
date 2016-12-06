@@ -13,10 +13,6 @@ set_black(){ echo -en "\033[1;40m";}
 
 new(){
 	field=();
-	# for ((i=0; i<$FIELD_SIZE; i++)) do
-		# temp=();
-		# for ((j=0; j<$FIELD_SIZE; j++)) do temp[$j]=$EMPTY_CELL; done;
-		# field[$i]=${temp[@]};
 	field_length=$(($FIELD_SIZE*$FIELD_SIZE));
 	for ((i=0; i<$field_length; i++)) do
 		field[$i]=$EMPTY_CELL;
@@ -26,8 +22,6 @@ new(){
 
 field(){
 	for ((i=0; i<$FIELD_SIZE; i++)) do
-		# for ((j=0; j<${#field[@]}; j++)) do 
-		# 	print_cell ${field[$i][$j]};
 		for ((j=0; j<$FIELD_SIZE; j++)) do
 			t=$(($i*$FIELD_SIZE+$j));
 			print_cell ${field[$t]}
@@ -49,7 +43,7 @@ print_cell(){
 	set_black;
 }
 
-make_move(){
+move(){
 	if (($1 >= $FIELD_SIZE)) || (($2 >= $FIELD_SIZE)); then
 		echo "Error index out of range.";
 		return 1;
@@ -63,12 +57,91 @@ make_move(){
 
 	field[$cell_index]=$3;
 	field;
+
+	is_some_line_full 1;
+	res=$?
+	if [ $res == 1 ] ; then
+		echo "First payer won!"
+	fi
+	is_some_line_full 2;
+	res=$?
+	if [ $res == 1 ] ; then
+		echo "Second payer won!"
+	fi
 }
 
 first(){
-	make_move $1 $2 1;
+	move $1 $2 1;
 }
 
 second(){
-	make_move $1 $2 2;
+	move $1 $2 2;
+}
+
+is_some_line_full(){
+	for ((i=0; i<$FIELD_SIZE; i++)) do
+		is_row_full $i $1
+		res=$?
+		if [ $res == 1 ] ; then
+			return 1;
+		fi
+
+		res=$?
+		if [ $res == 1 ] ; then
+			return 1;
+		fi
+	done;
+
+	is_main_diag_full $1
+	res=$?
+	if [ $res == 1 ] ; then
+		return 1;
+	fi
+	is_secondary_diag_full $1
+	res=$?
+	if [ $res == 1 ] ; then
+		return 1;
+	fi
+
+	return 0;
+}
+
+is_row_full(){
+	for ((j=0; j<$FIELD_SIZE; j++)) do
+		t=$(($1*$FIELD_SIZE+$j));
+		if [ ${field[$t]} != $2 ]; then
+			return 0;
+		fi
+	done;
+	return 1;
+}
+
+is_column_full(){
+	for ((i=0; i<$FIELD_SIZE; i++)) do
+		t=$(($i*$FIELD_SIZE+$1));
+		if [ ${field[$t]} != $2 ]; then
+			return 0;
+		fi
+	done;
+	return 1;
+}
+
+is_main_diag_full(){
+	for ((i=0; i<$FIELD_SIZE; i++)) do
+		t=$(($i*$FIELD_SIZE+$i));
+		if [ ${field[$t]} != $1 ]; then
+			return 0;
+		fi
+	done;
+	return 1;
+}
+
+is_secondary_diag_full(){
+	for ((i=0; i<$FIELD_SIZE; i++)) do
+		t=$(($i*$FIELD_SIZE+$FIELD_SIZE-$i-1));
+		if [ ${field[$t]} != $1 ]; then
+			return 0;
+		fi
+	done;
+	return 1;
 }

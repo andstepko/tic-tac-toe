@@ -17,6 +17,10 @@ new(){
 	for ((i=0; i<$field_length; i++)) do
 		field[$i]=$EMPTY_CELL;
 	done;
+
+	winner=0;
+	turn=1;
+	
 	field
 }
 
@@ -28,6 +32,14 @@ field(){
 		done;
 		printf '\n'
 	done;
+
+	if [ $winner == 0 ]; then
+		if [ $turn == 1 ]; then
+			echo "First player (O):"
+		else
+			echo "Second player (X):"
+		fi
+	fi
 }
 
 print_cell(){
@@ -46,51 +58,78 @@ print_cell(){
 }
 
 move(){
+	if [ $turn == 1 ]; then
+		first $1 $2
+	elif [ $turn == 2 ]; then
+		second $1 $2
+	fi
+}
+
+first(){
+	move_forcibly $1 $2 1;
+	res=$?
+	if [ $res == 1 ] ; then
+		turn=2;
+		echo_winners
+		field;
+	fi
+}
+
+second(){
+	move_forcibly $1 $2 2;
+	res=$?
+	if [ $res == 1 ] ; then
+		turn=1;
+		echo_winners
+		field;
+	fi
+}
+
+move_forcibly(){
 	if (($1 >= $FIELD_SIZE)) || (($2 >= $FIELD_SIZE)); then
 		echo "Error index out of range.";
-		return 1;
+		return 0;
 	fi
 
 	cell_index=$(($1*$FIELD_SIZE+$2));
 	if [ ${field[$cell_index]} != 0 ]; then
 		echo "Error cell is already not empty.";
-		return 1;
+		return 0;
 	fi
 
 	field[$cell_index]=$3;
-	field;
+	return 1;
+}
 
+echo_winners(){
 	is_some_line_full 1;
 	res=$?
 	if [ $res == 1 ] ; then
-		echo "First payer won!"
+		winner=1;
+		echo "First payer won (O)!"
+		return 1;
 	fi
+
 	is_some_line_full 2;
 	res=$?
 	if [ $res == 1 ] ; then
-		echo "Second payer won!"
+		winner=2;
+		echo "Second payer won (X)!"
+		return 1;
 	fi
 }
 
-first(){
-	move $1 $2 1;
-}
-
-second(){
-	move $1 $2 2;
-}
-
 is_some_line_full(){
-	for ((i=0; i<$FIELD_SIZE; i++)) do
-		is_row_full $i $1
+	for ((k=0; k<$FIELD_SIZE; k++)) do
+		is_row_full $k $1
 		res=$?
-		if [ $res == 1 ] ; then
+		if [ $res == 1 ]; then
 			return 1;
 		fi
 
-		is_column_full $i $1
+		is_column_full $k $1
 		res=$?
-		if [ $res == 1 ] ; then
+		if [ $res == 1 ]; then
 			return 1;
 		fi
 	done;

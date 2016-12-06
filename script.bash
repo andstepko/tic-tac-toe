@@ -58,10 +58,15 @@ print_cell(){
 }
 
 move(){
-	if [ $turn == 1 ]; then
-		first $1 $2
-	elif [ $turn == 2 ]; then
-		second $1 $2
+	if [ $winner == 0 ]; then
+		if [ $turn == 1 ]; then
+			first $1 $2
+		elif [ $turn == 2 ]; then
+			second $1 $2
+		fi
+	else
+		echo_winners
+		field
 	fi
 }
 

@@ -5,11 +5,13 @@ PLAYER_TWO_CELL=2;
 
 clear_console(){ echo -en "\033c";}
 
-set_blue(){ echo -en "\033[1;44m";}
+set_blue(){ echo -en "\e[44m";}
 
-set_red(){ echo -en "\033[1;41m";}
+set_red(){ echo -en "\e[41m";}
 
-set_black(){ echo -en "\033[1;40m";}
+set_black(){ echo -en "\e[40m";}
+
+set_default(){ echo -en "\e[0m";}
 
 new(){
 	field=();
@@ -54,7 +56,7 @@ print_cell(){
 		printf X
 	fi
 
-	set_black;
+	set_default;
 }
 
 move(){
